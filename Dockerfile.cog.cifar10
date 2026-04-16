@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /src
+
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir cog
+
+COPY model_cifar10.pth .
+COPY predict_cifar10.py .
+
+EXPOSE 5000
+
+CMD ["python", "-m", "cog.server.http"]

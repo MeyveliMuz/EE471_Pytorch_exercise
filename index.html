@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Giysi Sınıflandırıcı - Karşılaştırma</title>
+    <title>Görüntü Sınıflandırıcı</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,55 +13,59 @@
             padding: 30px 20px;
         }
 
-        h1 {
-            text-align: center;
-            color: #1a1a2e;
-            font-size: 1.8rem;
-            margin-bottom: 6px;
-        }
+        h1 { text-align: center; color: #1a1a2e; font-size: 1.8rem; margin-bottom: 6px; }
+        .subtitle { text-align: center; color: #666; font-size: 0.95rem; margin-bottom: 24px; }
 
-        .subtitle {
-            text-align: center;
-            color: #666;
+        /* Tab switcher */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+        .tab-btn {
+            padding: 10px 28px;
+            border: 2px solid #6366f1;
+            border-radius: 30px;
+            background: white;
+            color: #6366f1;
+            font-weight: 600;
             font-size: 0.95rem;
-            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+        .tab-btn.active { background: #6366f1; color: white; }
 
+        /* Upload */
         .upload-box {
             background: white;
             border-radius: 16px;
             padding: 24px;
             max-width: 400px;
-            margin: 0 auto 30px;
+            margin: 0 auto 28px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             text-align: center;
         }
-
         .upload-box label {
             display: block;
             border: 2px dashed #cbd5e1;
             border-radius: 12px;
-            padding: 30px 20px;
+            padding: 26px 20px;
             cursor: pointer;
             transition: border-color 0.2s;
             color: #64748b;
         }
-
         .upload-box label:hover { border-color: #6366f1; }
-
-        .upload-box label .icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
-
+        .upload-box label .icon { font-size: 2.2rem; display: block; margin-bottom: 8px; }
         #imageInput { display: none; }
-
         #preview {
             display: none;
-            max-width: 200px;
-            max-height: 200px;
+            max-width: 180px;
+            max-height: 180px;
             border-radius: 10px;
             margin: 14px auto 0;
             object-fit: contain;
         }
-
         .classify-btn {
             display: block;
             width: 100%;
@@ -76,10 +80,10 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-
         .classify-btn:hover { background: #4f46e5; }
         .classify-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
 
+        /* Comparison cards */
         .comparison {
             display: flex;
             gap: 20px;
@@ -87,7 +91,6 @@
             margin: 0 auto;
             flex-wrap: wrap;
         }
-
         .model-card {
             flex: 1;
             min-width: 260px;
@@ -97,8 +100,7 @@
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             text-align: center;
         }
-
-        .model-card .badge {
+        .badge {
             display: inline-block;
             padding: 4px 12px;
             border-radius: 20px;
@@ -106,17 +108,11 @@
             font-weight: 600;
             margin-bottom: 12px;
         }
-
-        .badge-base { background: #e0e7ff; color: #4338ca; }
+        .badge-base      { background: #e0e7ff; color: #4338ca; }
         .badge-optimized { background: #dcfce7; color: #15803d; }
 
-        .model-card h2 { font-size: 1.15rem; color: #1e293b; margin-bottom: 6px; }
-
-        .model-card .meta {
-            font-size: 0.82rem;
-            color: #94a3b8;
-            margin-bottom: 20px;
-        }
+        .model-card h2   { font-size: 1.1rem; color: #1e293b; margin-bottom: 4px; }
+        .model-card .meta { font-size: 0.82rem; color: #94a3b8; margin-bottom: 18px; }
 
         .result-box {
             background: #f8fafc;
@@ -130,47 +126,41 @@
             border: 2px solid transparent;
             transition: border-color 0.3s;
         }
-
         .result-box.success { border-color: #86efac; }
-
-        .result-label {
+        .result-label { font-size: 0.82rem; color: #94a3b8; margin-bottom: 6px; }
+        .result-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+        .winner-badge {
+            display: none;
+            margin-top: 8px;
             font-size: 0.82rem;
-            color: #94a3b8;
-            margin-bottom: 6px;
+            color: #15803d;
+            font-weight: 600;
         }
-
-        .result-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
         .spinner {
             display: none;
-            width: 28px;
-            height: 28px;
+            width: 26px; height: 26px;
             border: 3px solid #e2e8f0;
             border-top-color: #6366f1;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
             margin: 0 auto;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .winner-badge {
-            display: none;
-            margin-top: 10px;
-            font-size: 0.82rem;
-            color: #15803d;
-            font-weight: 600;
-        }
+        .section { display: none; }
+        .section.active { display: block; }
     </style>
 </head>
 <body>
-    <h1>🧥 Giysi Sınıflandırıcı</h1>
-    <p class="subtitle">Fashion MNIST — Model Karşılaştırması</p>
+    <h1>🧠 Görüntü Sınıflandırıcı</h1>
+    <p class="subtitle">Fashion MNIST & CIFAR10 — Model Karşılaştırması</p>
 
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('fashion')">👗 Fashion MNIST</button>
+        <button class="tab-btn"        onclick="switchTab('cifar')">🚗 CIFAR10</button>
+    </div>
+
+    <!-- Upload (shared) -->
     <div class="upload-box">
         <label for="imageInput">
             <span class="icon">📂</span>
@@ -178,117 +168,162 @@
         </label>
         <input type="file" id="imageInput" accept="image/*">
         <img id="preview" src="" alt="Önizleme">
-        <button class="classify-btn" onclick="classifyBoth()" id="btn">Sınıflandır</button>
+        <button class="classify-btn" id="btn" onclick="classifyBoth()">Sınıflandır</button>
     </div>
 
-    <div class="comparison">
-        <!-- Base Model -->
-        <div class="model-card">
-            <span class="badge badge-base">Temel Model</span>
-            <h2>SGD · 5 Epoch</h2>
-            <p class="meta">lr=1e-3 · batch=64 · acc≈65%</p>
-            <div class="result-box" id="box-base">
-                <div class="spinner" id="spin-base"></div>
-                <div class="result-label" id="label-base">Görsel yükleyip sınıflandır</div>
-                <div class="result-value" id="result-base">—</div>
-                <div class="winner-badge" id="winner-base">✓ Eşleşti</div>
+    <!-- Fashion MNIST section -->
+    <div id="section-fashion" class="section active">
+        <div class="comparison">
+            <div class="model-card">
+                <span class="badge badge-base">Temel Model</span>
+                <h2>Adam · 20 Epoch</h2>
+                <p class="meta">lr=1e-3 · batch=64 · acc≈88%</p>
+                <div class="result-box" id="box-f-base">
+                    <div class="spinner" id="spin-f-base"></div>
+                    <div class="result-label" id="label-f-base">Görsel yükleyip sınıflandır</div>
+                    <div class="result-value"  id="result-f-base">—</div>
+                    <div class="winner-badge"  id="winner-f-base">✓ Eşleşti</div>
+                </div>
+            </div>
+            <div class="model-card">
+                <span class="badge badge-optimized">Optimize Model</span>
+                <h2>Hyperparameter Optimized</h2>
+                <p class="meta">En iyi parametreler · acc≈88%+</p>
+                <div class="result-box" id="box-f-opt">
+                    <div class="spinner" id="spin-f-opt"></div>
+                    <div class="result-label" id="label-f-opt">Görsel yükleyip sınıflandır</div>
+                    <div class="result-value"  id="result-f-opt">—</div>
+                    <div class="winner-badge"  id="winner-f-opt">✓ Eşleşti</div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Optimized Model -->
-        <div class="model-card">
-            <span class="badge badge-optimized">Optimize Model</span>
-            <h2>Hyperparameter Optimized</h2>
-            <p class="meta">En iyi parametreler · acc≈88%</p>
-            <div class="result-box" id="box-opt">
-                <div class="spinner" id="spin-opt"></div>
-                <div class="result-label" id="label-opt">Görsel yükleyip sınıflandır</div>
-                <div class="result-value" id="result-opt">—</div>
-                <div class="winner-badge" id="winner-opt">✓ Eşleşti</div>
+    <!-- CIFAR10 section -->
+    <div id="section-cifar" class="section">
+        <div class="comparison">
+            <div class="model-card">
+                <span class="badge badge-base">Temel Model</span>
+                <h2>Adam · 20 Epoch</h2>
+                <p class="meta">lr=1e-3 · batch=64 · CIFAR10</p>
+                <div class="result-box" id="box-c-base">
+                    <div class="spinner" id="spin-c-base"></div>
+                    <div class="result-label" id="label-c-base">Görsel yükleyip sınıflandır</div>
+                    <div class="result-value"  id="result-c-base">—</div>
+                    <div class="winner-badge"  id="winner-c-base">✓ Eşleşti</div>
+                </div>
+            </div>
+            <div class="model-card">
+                <span class="badge badge-optimized">Optimize Model</span>
+                <h2>Hyperparameter Optimized</h2>
+                <p class="meta">En iyi parametreler · CIFAR10</p>
+                <div class="result-box" id="box-c-opt">
+                    <div class="spinner" id="spin-c-opt"></div>
+                    <div class="result-label" id="label-c-opt">Görsel yükleyip sınıflandır</div>
+                    <div class="result-value"  id="result-c-opt">—</div>
+                    <div class="winner-badge"  id="winner-c-opt">✓ Eşleşti</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const fileInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
+        let activeTab = 'fashion';
 
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
+        function switchTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', (tab === 'fashion' && i === 0) || (tab === 'cifar' && i === 1));
+            });
+            document.getElementById('section-fashion').classList.toggle('active', tab === 'fashion');
+            document.getElementById('section-cifar').classList.toggle('active',   tab === 'cifar');
+            resetResults();
+        }
+
+        document.getElementById('imageInput').addEventListener('change', () => {
+            const file = document.getElementById('imageInput').files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = e => {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
+                const p = document.getElementById('preview');
+                p.src = e.target.result;
+                p.style.display = 'block';
             };
             reader.readAsDataURL(file);
         });
 
-        function setLoading(isLoading) {
-            const btn = document.getElementById('btn');
-            btn.disabled = isLoading;
-            ['base', 'opt'].forEach(id => {
-                document.getElementById(`spin-${id}`).style.display = isLoading ? 'block' : 'none';
-                document.getElementById(`result-${id}`).textContent = isLoading ? '' : document.getElementById(`result-${id}`).textContent;
-                document.getElementById(`label-${id}`).style.display = isLoading ? 'none' : 'block';
+        function resetResults() {
+            ['f-base','f-opt','c-base','c-opt'].forEach(id => {
+                document.getElementById(`result-${id}`).textContent = '—';
+                document.getElementById(`label-${id}`).textContent  = 'Görsel yükleyip sınıflandır';
+                document.getElementById(`box-${id}`).classList.remove('success');
+                document.getElementById(`winner-${id}`).style.display = 'none';
+                document.getElementById(`spin-${id}`).style.display   = 'none';
+            });
+        }
+
+        function setLoading(ids, isLoading) {
+            document.getElementById('btn').disabled = isLoading;
+            ids.forEach(id => {
+                document.getElementById(`spin-${id}`).style.display  = isLoading ? 'block' : 'none';
+                document.getElementById(`label-${id}`).style.display = isLoading ? 'none'  : 'block';
+                if (isLoading) document.getElementById(`result-${id}`).textContent = '';
             });
         }
 
         async function classify(endpoint) {
-            const file = fileInput.files[0];
+            const file = document.getElementById('imageInput').files[0];
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
                     try {
-                        const res = await fetch(endpoint, {
+                        const res  = await fetch(endpoint, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ input: { image: reader.result } })
                         });
                         const data = await res.json();
                         resolve(data.output);
-                    } catch (e) { reject(e); }
+                    } catch(e) { reject(e); }
                 };
             });
         }
 
         async function classifyBoth() {
-            if (!fileInput.files.length) {
+            if (!document.getElementById('imageInput').files.length) {
                 alert('Lütfen önce bir görsel seçin.');
                 return;
             }
 
-            setLoading(true);
+            const isFashion = activeTab === 'fashion';
+            const ids       = isFashion ? ['f-base', 'f-opt'] : ['c-base', 'c-opt'];
+            const endpoints = isFashion
+                ? ['/predictions', '/predictions/optimized']
+                : ['/predictions/cifar10', '/predictions/cifar10/optimized'];
 
-            // Reset
-            ['base', 'opt'].forEach(id => {
-                document.getElementById(`result-${id}`).textContent = '';
-                document.getElementById(`box-${id}`).classList.remove('success');
-                document.getElementById(`winner-${id}`).style.display = 'none';
-            });
+            setLoading(ids, true);
 
-            const [baseResult, optResult] = await Promise.allSettled([
-                classify('/predictions'),
-                classify('/predictions/optimized')
+            const [r1, r2] = await Promise.allSettled([
+                classify(endpoints[0]),
+                classify(endpoints[1])
             ]);
 
-            setLoading(false);
+            setLoading(ids, false);
 
-            const baseVal = baseResult.status === 'fulfilled' ? baseResult.value : 'Hata';
-            const optVal = optResult.status === 'fulfilled' ? optResult.value : 'Hata';
+            const vals = [
+                r1.status === 'fulfilled' ? r1.value : 'Hata',
+                r2.status === 'fulfilled' ? r2.value : 'Hata',
+            ];
 
-            document.getElementById('result-base').textContent = baseVal;
-            document.getElementById('result-opt').textContent = optVal;
-            document.getElementById('label-base').textContent = 'Temel Model';
-            document.getElementById('label-opt').textContent = 'Optimize Model';
+            ids.forEach((id, i) => {
+                document.getElementById(`result-${id}`).textContent = vals[i];
+                document.getElementById(`label-${id}`).textContent  = i === 0 ? 'Temel Model' : 'Optimize Model';
+                if (vals[i] !== 'Hata') document.getElementById(`box-${id}`).classList.add('success');
+            });
 
-            if (baseVal !== 'Hata') document.getElementById('box-base').classList.add('success');
-            if (optVal !== 'Hata') document.getElementById('box-opt').classList.add('success');
-
-            if (baseVal === optVal && baseVal !== 'Hata') {
-                document.getElementById('winner-base').style.display = 'block';
-                document.getElementById('winner-opt').style.display = 'block';
+            if (vals[0] === vals[1] && vals[0] !== 'Hata') {
+                ids.forEach(id => document.getElementById(`winner-${id}`).style.display = 'block');
             }
         }
     </script>
