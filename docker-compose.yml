@@ -17,6 +17,24 @@ services:
     environment:
       - COG_PREDICT_TYPE_STUB=predict_optimized.py:Predictor
 
+  cog-api-cifar10:
+    build:
+      context: .
+      dockerfile: Dockerfile.cog.cifar10
+    ports:
+      - "5003:5000"
+    environment:
+      - COG_PREDICT_TYPE_STUB=predict_cifar10.py:Predictor
+
+  cog-api-cifar10-optimized:
+    build:
+      context: .
+      dockerfile: Dockerfile.cog.cifar10.optimized
+    ports:
+      - "5004:5000"
+    environment:
+      - COG_PREDICT_TYPE_STUB=predict_cifar10_optimized.py:Predictor
+
   web:
     build:
       context: .
@@ -26,6 +44,10 @@ services:
     environment:
       - API_URL=http://cog-api:5000/predictions
       - API_URL_OPTIMIZED=http://cog-api-optimized:5000/predictions
+      - API_URL_CIFAR10=http://cog-api-cifar10:5000/predictions
+      - API_URL_CIFAR10_OPTIMIZED=http://cog-api-cifar10-optimized:5000/predictions
     depends_on:
       - cog-api
       - cog-api-optimized
+      - cog-api-cifar10
+      - cog-api-cifar10-optimized
