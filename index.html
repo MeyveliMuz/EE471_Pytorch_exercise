@@ -1,82 +1,296 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
-    <title>Giysi Sınıflandırıcı</title>
+    <title>Giysi Sınıflandırıcı - Karşılaştırma</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        h1 {
             text-align: center;
-            margin-top: 50px;
+            color: #1a1a2e;
+            font-size: 1.8rem;
+            margin-bottom: 6px;
         }
 
-        .container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            width: 300px;
-            margin: auto;
-            border-radius: 10px;
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
         }
 
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
+        .upload-box {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            margin: 0 auto 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .upload-box label {
+            display: block;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 30px 20px;
             cursor: pointer;
+            transition: border-color 0.2s;
+            color: #64748b;
         }
 
-        #result {
-            margin-top: 20px;
-            font-weight: bold;
-            color: #333;
+        .upload-box label:hover { border-color: #6366f1; }
+
+        .upload-box label .icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+
+        #imageInput { display: none; }
+
+        #preview {
+            display: none;
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            margin: 14px auto 0;
+            object-fit: contain;
+        }
+
+        .classify-btn {
+            display: block;
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .classify-btn:hover { background: #4f46e5; }
+        .classify-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+        .comparison {
+            display: flex;
+            gap: 20px;
+            max-width: 860px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .model-card {
+            flex: 1;
+            min-width: 260px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .model-card .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .badge-base { background: #e0e7ff; color: #4338ca; }
+        .badge-optimized { background: #dcfce7; color: #15803d; }
+
+        .model-card h2 { font-size: 1.15rem; color: #1e293b; margin-bottom: 6px; }
+
+        .model-card .meta {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 18px 12px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .result-box.success { border-color: #86efac; }
+
+        .result-label {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+
+        .result-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .spinner {
+            display: none;
+            width: 28px;
+            height: 28px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .winner-badge {
+            display: none;
+            margin-top: 10px;
+            font-size: 0.82rem;
+            color: #15803d;
+            font-weight: 600;
         }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <h2>Giysi Sınıflandırıcı</h2>
-        <p>Fashion MNIST - PyTorch</p>
+    <h1>🧥 Giysi Sınıflandırıcı</h1>
+    <p class="subtitle">Fashion MNIST — Model Karşılaştırması</p>
+
+    <div class="upload-box">
+        <label for="imageInput">
+            <span class="icon">📂</span>
+            Görsel seç veya buraya bırak
+        </label>
         <input type="file" id="imageInput" accept="image/*">
-        <br>
-        <button onclick="classifyGarment()">Sınıflandır</button>
-        <p id="result"></p>
+        <img id="preview" src="" alt="Önizleme">
+        <button class="classify-btn" onclick="classifyBoth()" id="btn">Sınıflandır</button>
+    </div>
+
+    <div class="comparison">
+        <!-- Base Model -->
+        <div class="model-card">
+            <span class="badge badge-base">Temel Model</span>
+            <h2>SGD · 5 Epoch</h2>
+            <p class="meta">lr=1e-3 · batch=64 · acc≈65%</p>
+            <div class="result-box" id="box-base">
+                <div class="spinner" id="spin-base"></div>
+                <div class="result-label" id="label-base">Görsel yükleyip sınıflandır</div>
+                <div class="result-value" id="result-base">—</div>
+                <div class="winner-badge" id="winner-base">✓ Eşleşti</div>
+            </div>
+        </div>
+
+        <!-- Optimized Model -->
+        <div class="model-card">
+            <span class="badge badge-optimized">Optimize Model</span>
+            <h2>Hyperparameter Optimized</h2>
+            <p class="meta">En iyi parametreler · acc≈88%</p>
+            <div class="result-box" id="box-opt">
+                <div class="spinner" id="spin-opt"></div>
+                <div class="result-label" id="label-opt">Görsel yükleyip sınıflandır</div>
+                <div class="result-value" id="result-opt">—</div>
+                <div class="winner-badge" id="winner-opt">✓ Eşleşti</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        async function classifyGarment() {
-            const fileInput = document.getElementById('imageInput');
-            const resultText = document.getElementById('result');
+        const fileInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
 
-            if (fileInput.files.length === 0) {
-                resultText.innerText = "Lütfen önce bir fotoğraf seçin.";
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('btn');
+            btn.disabled = isLoading;
+            ['base', 'opt'].forEach(id => {
+                document.getElementById(`spin-${id}`).style.display = isLoading ? 'block' : 'none';
+                document.getElementById(`result-${id}`).textContent = isLoading ? '' : document.getElementById(`result-${id}`).textContent;
+                document.getElementById(`label-${id}`).style.display = isLoading ? 'none' : 'block';
+            });
+        }
+
+        async function classify(endpoint) {
+            const file = fileInput.files[0];
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    try {
+                        const res = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ input: { image: reader.result } })
+                        });
+                        const data = await res.json();
+                        resolve(data.output);
+                    } catch (e) { reject(e); }
+                };
+            });
+        }
+
+        async function classifyBoth() {
+            if (!fileInput.files.length) {
+                alert('Lütfen önce bir görsel seçin.');
                 return;
             }
 
-            resultText.innerText = "Analiz ediliyor...";
-            const file = fileInput.files[0];
-            const reader = new FileReader();
+            setLoading(true);
 
-            reader.readAsDataURL(file);
-            reader.onload = async function () {
-                const base64Image = reader.result;
+            // Reset
+            ['base', 'opt'].forEach(id => {
+                document.getElementById(`result-${id}`).textContent = '';
+                document.getElementById(`box-${id}`).classList.remove('success');
+                document.getElementById(`winner-${id}`).style.display = 'none';
+            });
 
-                try {
-                    const response = await fetch('/predictions', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ input: { image: base64Image } })
-                    });
+            const [baseResult, optResult] = await Promise.allSettled([
+                classify('/predictions'),
+                classify('/predictions/optimized')
+            ]);
 
-                    const data = await response.json();
-                    resultText.innerText = "Sonuç: " + data.output;
-                } catch (error) {
-                    console.error("Detaylı Hata:", error);
-                    resultText.innerText = "Bağlantı hatası: " + error.message;
-                }
-            };
+            setLoading(false);
+
+            const baseVal = baseResult.status === 'fulfilled' ? baseResult.value : 'Hata';
+            const optVal = optResult.status === 'fulfilled' ? optResult.value : 'Hata';
+
+            document.getElementById('result-base').textContent = baseVal;
+            document.getElementById('result-opt').textContent = optVal;
+            document.getElementById('label-base').textContent = 'Temel Model';
+            document.getElementById('label-opt').textContent = 'Optimize Model';
+
+            if (baseVal !== 'Hata') document.getElementById('box-base').classList.add('success');
+            if (optVal !== 'Hata') document.getElementById('box-opt').classList.add('success');
+
+            if (baseVal === optVal && baseVal !== 'Hata') {
+                document.getElementById('winner-base').style.display = 'block';
+                document.getElementById('winner-opt').style.display = 'block';
+            }
         }
     </script>
 </body>
-
 </html>
