@@ -1,11 +1,17 @@
 services:
   cog-api:
-    image: fashion-mnist-api
+    build:
+      context: .
+      dockerfile: Dockerfile.cog
     ports:
       - "5001:5000"
+    environment:
+      - COG_PREDICT_TYPE_STUB=predict.py:Predictor
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
